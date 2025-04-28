@@ -1,37 +1,101 @@
 package com.comarch.szkolenia.car.rent.gui;
 
-import com.comarch.szkolenia.car.rent.model.Bus;
-import com.comarch.szkolenia.car.rent.model.Vehicle;
+import com.comarch.szkolenia.car.rent.authentication.Authenticator;
+import com.comarch.szkolenia.car.rent.database.UserRepository;
+import com.comarch.szkolenia.car.rent.database.VehicleRepository;
+import com.comarch.szkolenia.car.rent.model.*;
 
+import java.util.Collection;
 import java.util.Scanner;
 
 public class GUI {
-    private final static Scanner scanner = new Scanner(System.in);
+    private final Scanner scanner = new Scanner(System.in);
+    private final static GUI instance = new GUI();
 
-    public static String showMenuAndReadChoose() {
+    private GUI() {
+    }
+
+    public String showMenuAndReadChoose() {
         System.out.println("1. List vehicles");
-        System.out.println("2. Rent vehicle");
-        System.out.println("3. Exit");
+        System.out.println(Authenticator.currentUserRole.equals(Constants.ADMIN_ROLE) ?
+                "2. Add vehicle" : "2. Rent vehicle");
+        System.out.println("3. Logout");
+        System.out.println("4. Exit");
 
         return scanner.nextLine();
     }
 
-    public static void showVehicles(Vehicle[] vehicles) {
-        for(Vehicle vehicle : vehicles) {
+    public void showVehicles() {
+        for(Vehicle vehicle : VehicleRepository.getInstance().getVehicles()) {
             System.out.println(vehicle);
         }
     }
 
-    public static String readPlate() {
+    public String readPlate() {
         System.out.println("Enter plate:");
         return scanner.nextLine();
     }
 
-    public static void showResult(boolean result) {
+    public void showResult(boolean result) {
         System.out.println(result ? "Success !!" : "Error !!");
     }
 
-    public static void showWrongChoose() {
+    public void showWrongChoose() {
         System.out.println("Wrong choose !! Pick again !!");
+    }
+
+    public User readCredentials() {
+        System.out.println("Enter login:");
+        String login = scanner.nextLine();
+        System.out.println("Enter password:");
+        return new User(login, scanner.nextLine());
+    }
+
+    public void showIncorrectCredentials() {
+        System.out.println("Incorrect credentials");
+    }
+
+    public String askForVehicleType() {
+        System.out.println("Select vehicle type: (C/B/M)");
+        return scanner.nextLine();
+    }
+
+    public Car readCar() {
+        Car car = new Car();
+        readVehicleCommonData(car);
+        return car;
+    }
+
+    public Bus readBus() {
+        Bus bus = new Bus();
+        readVehicleCommonData(bus);
+        System.out.println("Seats:");
+        bus.setSeats(Integer.parseInt(scanner.nextLine()));
+        return bus;
+    }
+
+    public Motorcycle readMotorcycle() {
+        Motorcycle motorcycle = new Motorcycle();
+        readVehicleCommonData(motorcycle);
+        System.out.println("Additional seat: (Y/N)");
+        motorcycle.setAdditionalSeat(scanner.nextLine().equals("Y"));
+        return motorcycle;
+    }
+
+    public void readVehicleCommonData(Vehicle vehicle) {
+        System.out.println("Brand:");
+        vehicle.setBrand(scanner.nextLine());
+        System.out.println("Model:");
+        vehicle.setModel(scanner.nextLine());
+        System.out.println("Year:");
+        vehicle.setYear(Integer.parseInt(scanner.nextLine()));
+        System.out.println("Price:");
+        vehicle.setPrice(Double.parseDouble(scanner.nextLine()));
+        System.out.println("Plate:");
+        vehicle.setPlate(scanner.nextLine());
+    }
+
+    public static GUI getInstance() {
+        return instance;
     }
 }
