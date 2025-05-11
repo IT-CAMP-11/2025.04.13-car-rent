@@ -1,8 +1,9 @@
 package com.comarch.szkolenia.car.rent.core;
 
 import com.comarch.szkolenia.car.rent.authentication.Authenticator;
-import com.comarch.szkolenia.car.rent.database.UserRepository;
 import com.comarch.szkolenia.car.rent.database.VehicleRepository;
+import com.comarch.szkolenia.car.rent.exceptions.FailedAuthenticationException;
+import com.comarch.szkolenia.car.rent.exceptions.RentVehicleException;
 import com.comarch.szkolenia.car.rent.gui.GUI;
 import com.comarch.szkolenia.car.rent.model.Constants;
 import com.comarch.szkolenia.car.rent.model.User;
@@ -27,7 +28,12 @@ public class Core {
                     if(Authenticator.currentUserRole.equals(Constants.ADMIN_ROLE)) {
                         addVehicle();
                     } else {
-                        gui.showResult(vehicleRepository.rentVehicle(gui.readPlate()));
+                        try {
+                            vehicleRepository.rentVehicle(gui.readPlate());
+                            gui.showResult(true);
+                        } catch (RentVehicleException e) {
+                            gui.showResult(false);
+                        }
                     }
                     break;
                 case "3":
@@ -48,8 +54,11 @@ public class Core {
         int counter = 0;
         do {
             User user = gui.readCredentials();
-            result = authenticator.authenticate(user.getLogin(), user.getPassword());
-            if(!result) {
+            try {
+                authenticator.authenticate(user.getLogin(), user.getPassword());
+                result = true;
+            } catch (FailedAuthenticationException e) {
+                result = false;
                 gui.showIncorrectCredentials();
             }
             counter++;

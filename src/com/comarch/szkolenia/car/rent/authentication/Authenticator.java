@@ -1,6 +1,7 @@
 package com.comarch.szkolenia.car.rent.authentication;
 
 import com.comarch.szkolenia.car.rent.database.UserRepository;
+import com.comarch.szkolenia.car.rent.exceptions.FailedAuthenticationException;
 import com.comarch.szkolenia.car.rent.model.User;
 import org.apache.commons.codec.digest.DigestUtils;
 
@@ -13,15 +14,14 @@ public class Authenticator {
     private Authenticator() {
     }
 
-    public boolean authenticate(String login, String password) {
+    public void authenticate(String login, String password) {
         User user = this.userRepository.findUser(login);
 
-        if(user != null && user.getPassword().equals(DigestUtils.md5Hex(password+seed))) {
-            currentUserRole = user.getRole();
-            return true;
+        if(user == null || !user.getPassword().equals(DigestUtils.md5Hex(password+seed))) {
+            throw new FailedAuthenticationException();
         }
 
-        return false;
+        currentUserRole = user.getRole();
     }
 
     public static Authenticator getInstance() {

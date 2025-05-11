@@ -1,5 +1,6 @@
 package com.comarch.szkolenia.car.rent.database;
 
+import com.comarch.szkolenia.car.rent.exceptions.RentVehicleException;
 import com.comarch.szkolenia.car.rent.model.Bus;
 import com.comarch.szkolenia.car.rent.model.Car;
 import com.comarch.szkolenia.car.rent.model.Motorcycle;
@@ -31,15 +32,14 @@ public class VehicleRepository {
                         200.00, "KR999", true));
     }
 
-    public boolean rentVehicle(String plate) {
+    public void rentVehicle(String plate) {
         Vehicle vehicle = this.vehicles.get(plate);
 
-        if(vehicle != null && !vehicle.isRent()) {
-            vehicle.setRent(true);
-            return true;
+        if(vehicle == null || vehicle.isRent()) {
+            throw new RentVehicleException();
         }
 
-        return false;
+        vehicle.setRent(true);
     }
 
     public void addVehicle(Vehicle vehicle) {

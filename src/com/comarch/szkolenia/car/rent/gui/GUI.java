@@ -1,15 +1,14 @@
 package com.comarch.szkolenia.car.rent.gui;
 
 import com.comarch.szkolenia.car.rent.authentication.Authenticator;
-import com.comarch.szkolenia.car.rent.database.UserRepository;
 import com.comarch.szkolenia.car.rent.database.VehicleRepository;
 import com.comarch.szkolenia.car.rent.model.*;
 
-import java.util.Collection;
 import java.util.Scanner;
 
 public class GUI {
     private final Scanner scanner = new Scanner(System.in);
+    private final VehicleRepository vehicleRepository = VehicleRepository.getInstance();
     private final static GUI instance = new GUI();
 
     private GUI() {
@@ -26,7 +25,7 @@ public class GUI {
     }
 
     public void showVehicles() {
-        for(Vehicle vehicle : VehicleRepository.getInstance().getVehicles()) {
+        for(Vehicle vehicle : this.vehicleRepository.getVehicles()) {
             System.out.println(vehicle);
         }
     }
